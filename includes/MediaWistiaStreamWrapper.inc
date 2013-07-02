@@ -6,8 +6,6 @@
  *  Create a Wistia Stream Wrapper class for the Media/Resource module.
  */
 
-include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/includes/media_wistia.browser.inc';
-
 include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/includes/DrupalWistiaApi.php';
 
 /**
@@ -27,12 +25,11 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
    * Checks to see if the video is in our cache, if not we request from the api.
    */
   function interpolateUrl() {
-    $media = array();
-    if ($parameters = $this->get_parameters()) {
-      $media = _media_wistia_get_video_from_cache($parameters['v']);
-      if(empty($media)) {
-        $media = $this->api->mediaShow($parameters['v']);
-      }
+    $parameters = $this->get_parameters();
+    if (!empty($parameters['url'])) {
+      $media = $parameters['url'];
+    } else {
+      $media = $this->api->mediaShow($parameters['v']);
     }
     return $media;
   }
@@ -51,10 +48,16 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
    * Gets the original thumbnail for the wistia video
    * @return mixed
    */
-  function getOriginalThumbnailPath() {
+  function getOriginalThumbnailPath($http_path = '') {
     $parts = $this->get_parameters();
-    $media = $this->api->mediaShow($parts['v']);
-    return $media->thumbnail->url;
+    if(!empty($parts['url'])) {
+      $media = _media_wistia_request_data($parts['url']);
+      $url = $media['thumbnail_url'];
+    } else {
+      $media = $this->api->mediaShow($parts['v']);
+      $url = $media->thumbnail->url;
+    }
+    return $url;
   }
 
   /**
@@ -67,7 +70,9 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
     if (!file_exists($local_path)) {
       $dirname = drupal_dirname($local_path);
       file_prepare_directory($dirname, FILE_CREATE_DIRECTORY | FILE_MODIFY_PERMISSIONS);
+
       $response = drupal_http_request($this->getOriginalThumbnailPath());
+
       if (!isset($response->error)) {
         file_unmanaged_save_data($response->data, $local_path, TRUE);
       }
@@ -76,5 +81,34 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
       }
     }
     return $local_path;
+  }
+
+  function setUri($uri) {
+    $this->uri = $uri;
+    $parameters = $this->_parse_url($uri);
+    if($parameters['v'] == 'http') {
+      $parameters['url'] =  $this->mediaWistiaParseHttpUrl($this->getUri());
+      $parameters['v'] = $this->parse($parameters['url']);
+    }
+
+    $this->parameters = $parameters;
+  }
+
+  function mediaWistiaParseHttpUrl($url) {
+    $parts = explode("//v/", $url);
+
+    return $parts[1];
+  }
+
+  function parse($embedCode) {
+    $patterns = array(
+      '/https?:\/\/(.+)?(wistia\.com|wi\.st)\/(medias|embed)\/(.*)/',
+    );
+    foreach ($patterns as $pattern) {
+      preg_match($pattern, $embedCode, $matches);
+      if (isset($matches[4])) {
+        return $matches[4];
+      }
+    }
   }
 }

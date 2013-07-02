@@ -42,14 +42,18 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
    * @param null $uri
    * @return mixed|StdClass
    */
-  public function getFileObject($uri = null) {
-    if(!$uri) {
-      $uri = $this->parse($this->embedCode);
+  public function getFileObject() {
+    $uri = $this->parse($this->embedCode);
+    if(!strncmp($this->embedCode, 'http', strlen('http'))) {
+      $uri = 'wistia://v/' . $this->embedCode;
     }
+    $info = $this->getOEmbed();
+
     $file = file_uri_to_object($uri, TRUE);
 
-    if (empty($file->fid) && $info = $this->getOEmbed($uri)) {
-      $file->filename = truncate_utf8($info->name, 255);
+    if (empty($file->fid) && $info) {
+      $file->filename = truncate_utf8($info['title'], 255);
+      $file->uri = $uri;
     }
 
     return $file;
@@ -63,11 +67,11 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
    *   'url', and other information as specified by the oEmbed standard.
    *   Otherwise, NULL.
    */
-  public function getOEmbed($uri = null) {
-    if(!$uri) {
-      $uri = $this->parse($this->embedCode);
+  public function getOEmbed() {
+    static $response;
+    if(empty($response)) {
+      $response = _media_wistia_request_data($this->embedCode);
     }
-    $response = file_create_url($uri);
     if (!empty($response)) {
       return $response;
     }

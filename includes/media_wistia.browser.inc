@@ -86,14 +86,13 @@ function _media_wistia_create_temporary_files(&$videos) {
     if($video) {
 
       $uri = 'wistia://v/' . $video->hashed_id;
-      $handler = new MediaInternetWistiaHandler($uri);
-      $file = $handler->getFileObject($uri);
+      $file = file_uri_to_object($uri, TRUE);
+      $file->filename = $video->name;
       $file->type = 'video';
       $file = file_save($file);
 
       $preview = media_get_thumbnail_preview($file);
       $file->preview = drupal_render($preview);
-//      $file->url = file_create_url($file->uri);
 
       $video->file = $file;
 

@@ -7,6 +7,9 @@
  * by Wistia.
  */
 
+define('MEDIA_WISTIA_DEFAULT_API_URL', 'https://api.wistia.com/v1/');
+define('MEDIA_WISTIA_DEFAULT_OEMBED_URL', 'http://fast.wistia.com/oembed');
+
 // A registry of variable_get defaults.
 include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/includes/media_wistia.variables.inc';
 
@@ -38,17 +41,12 @@ function media_wistia_media_internet_providers()
  */
 function media_wistia_stream_wrappers()
 {
-  $info = array();
-  $api_key = variable_get('media_wistia_api_key', '');
-
-  if (!empty($api_key)) {
-    $info['wistia'] = array(
-      'name' => t('Wistia videos'),
-      'class' => 'MediaWistiaStreamWrapper',
-      'description' => t('Videos provided by Wistia.'),
-      'type' => STREAM_WRAPPERS_READ_VISIBLE,
-    );
-  }
+  $info['wistia'] = array(
+    'name' => t('Wistia videos'),
+    'class' => 'MediaWistiaStreamWrapper',
+    'description' => t('Videos provided by Wistia.'),
+    'type' => STREAM_WRAPPERS_READ_VISIBLE,
+  );
 
   return $info;
 }
@@ -61,7 +59,7 @@ function media_wistia_media_browser_plugin_info()
   $plugins = array();
   $api_key = variable_get('media_wistia_api_key', '');
 
-  if(!empty($api_key)) {
+  if (!empty($api_key)) {
     $plugins['wistia'] = array(
       '#weight' => 20,
     );
@@ -213,5 +211,35 @@ function media_wistia_ctools_plugin_api($owner, $api)
   );
   if (isset($api_versions[$owner][$api])) {
     return array('version' => $api_versions[$owner][$api]);
+  }
+}
+
+
+/**
+ * Requests video or playlist data from Wistia via oEmbed.
+ *
+ * @param string $url
+ *   The video or playlist URL.
+ *
+ * @return array|FALSE
+ *   An array of data about the video or playlist if the request is successful,
+ *   otherwise FALSE.
+ */
+function _media_wistia_request_data($url)
+{
+  // Make HTTP request.
+  $endpoint = variable_get('media_wistia_oembed_url', MEDIA_WISTIA_DEFAULT_OEMBED_URL);
+  $url_options['query'] = array(
+    'url' => $url
+  );
+  $result = drupal_http_request(url($endpoint, $url_options));
+
+  if ($data = json_decode($result->data)) {
+    // Success.
+    return (array)$data;
+  } else {
+    // Failure. Either the video or playlist doesn't exist on Wistia or there
+    // was an error with the request.
+    return FALSE;
   }
 }
