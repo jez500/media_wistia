@@ -23,12 +23,5 @@
 
 ?>
 <div class="<?php print $classes; ?> media-wistia-<?php print $id; ?>">
-  <iframe
-    src="<?php print $url; ?>"
-    allowtransparency="true"
-    frameborder="0"
-    scrolling="no"
-    class="wistia_embed"
-    name="wistia_embed"
-    width="<?php print $width ?>" height="<?php print $height ?>"></iframe>
+    <?php print $embed; ?>
 </div>

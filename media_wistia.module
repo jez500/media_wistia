@@ -9,6 +9,7 @@
 
 define('MEDIA_WISTIA_DEFAULT_API_URL', 'https://api.wistia.com/v1/');
 define('MEDIA_WISTIA_DEFAULT_OEMBED_URL', 'http://fast.wistia.com/oembed');
+define('MEDIA_WISTIA_DEFAULT_GETEMBED_URL', 'http://get-embed.wistia.com/oembed.json');
 
 // A registry of variable_get defaults.
 include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/includes/media_wistia.variables.inc';

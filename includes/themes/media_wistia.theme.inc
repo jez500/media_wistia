@@ -37,7 +37,7 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
     $protocol = $variables['options']['protocol'];
   }
   else {
-    $protocol = '//';
+    $protocol = 'http://';
   }
 
   // Make the file object available.
@@ -50,24 +50,54 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
   $variables['alternative_content'] = t('Video of @title', array('@title' => $variables['title']));
 
   $query = array(
-    'version' => 'v1',
     'playButton' => $variables['options']['play_button'] ? 'true' : 'false',
     'smallPlayButton' => $variables['options']['small_play_button'] ? 'true' : 'false',
     'playbar' => $variables['options']['playbar'] ? 'true' : 'false',
     'controlsVisibleOnLoad' => $variables['options']['controls_on_load'] ? 'true' : 'false',
-    'videoHeight' => $variables['options']['height'],
-    'videoWidth' => $variables['options']['width'],
+    'height' => $variables['options']['height'],
+    'width' => $variables['options']['width'],
     'volumeControl' => $variables['options']['volume_control'] ? 'true' : 'false',
     'fullscreenButton' => $variables['options']['fullscreen'] ? 'true' : 'false',
     'autoPlay' => $variables['options']['autoplay'] ? 'true' : 'false',
     'playerColor' => $variables['options']['color'],
     'endVideoBehavior' => $variables['options']['end_video'],
+    'embedType' => 'iframe' // or api, or seo
   );
 
-  $url = $protocol . 'fast.wistia.net/embed/iframe/' . $variables['video_id'] . '?' . http_build_query($query);
+  $url = $protocol . 'fast.wistia.net/embed/medias/' . $variables['video_id'] . '?' . http_build_query($query);
 
-  drupal_alter('media_wistia_iframe', $url);
+  $params = array('url' => $url);
+
+  $embed = _media_wistia_request_embed($params);
 
   // Build the iframe URL with options query strings
-  $variables['url'] = $url;
+  $variables['embed'] = $embed['html'];
+}
+
+
+
+/**
+ * Requests video or playlist embed from Wistia via oEmbed.
+ *
+ * @param string $url
+ *   The video or playlist URL.
+ *
+ * @return array|FALSE
+ *   An array of data about the video or playlist if the request is successful,
+ *   otherwise FALSE.
+ */
+function _media_wistia_request_embed($query)
+{
+  // Make HTTP request.
+  $endpoint = variable_get('media_wistia_getembed_url', MEDIA_WISTIA_DEFAULT_GETEMBED_URL);
+  $result = drupal_http_request(url($endpoint, array('query' => $query)));
+
+  if ($data = json_decode($result->data)) {
+    // Success.
+    return (array)$data;
+  } else {
+    // Failure. Either the video or playlist doesn't exist on Wistia or there
+    // was an error with the request.
+    return FALSE;
+  }
 }
