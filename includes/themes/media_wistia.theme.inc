@@ -80,17 +80,10 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
   $variables['embed'] = $embed['html'];
 }
 
-
-
 /**
- * Requests video or playlist embed from Wistia via oEmbed.
- *
- * @param string $url
- *   The video or playlist URL.
- *
- * @return array|FALSE
- *   An array of data about the video or playlist if the request is successful,
- *   otherwise FALSE.
+ * Request to embed code from the wistia get embed endpoint.
+ * @param $query array the quiery string to send to the endpoint.
+ * @return array|bool
  */
 function _media_wistia_request_embed($query)
 {
