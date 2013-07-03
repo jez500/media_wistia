@@ -100,6 +100,11 @@ function media_wistia_file_formatter_video_settings($form, &$form_state, $settin
       )
     )
   );
+  $element['ssl'] = array(
+    '#title' => t('Use SSL'),
+    '#type' => 'checkbox',
+    '#default_value' => $settings['ssl'],
+  );
 
   // Single Options.
   $element['color'] = array(
@@ -151,27 +156,6 @@ function media_wistia_file_formatter_video_settings($form, &$form_state, $settin
     '#title' => t('Controls visible on load'),
     '#type' => 'checkbox',
     '#default_value' => $settings['controls_on_load'],
-  );
-
-  $element['protocol_specify'] = array(
-    '#title' => t('Specify a http protocol'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['protocol_specify'],
-    '#description' => t('An explicit protocol may be neccesary for videos embedded in RSS feeds and emails. If no protocol is specified, iframes will be protocol relative.'),
-  );
-  $element['protocol'] = array(
-    '#title' => t('Iframe protocol'),
-    '#type' => 'radios',
-    '#default_value' => $settings['protocol'],
-    '#options' => array(
-      'http:' => 'http://',
-      'https:' => 'https://',
-    ),
-    '#states' => array(
-      'invisible' => array(
-        ':input[name="displays[media_wistia_video][settings][protocol_specify]"]' => array('checked' => FALSE),
-      ),
-    ),
   );
 
   return $element;

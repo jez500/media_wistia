@@ -33,13 +33,6 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
     }
   }
 
-  if ($variables['options']['protocol_specify']) {
-    $protocol = $variables['options']['protocol'];
-  }
-  else {
-    $protocol = 'http://';
-  }
-
   // Make the file object available.
   $file_object = file_uri_to_object($variables['uri']);
 
@@ -65,7 +58,7 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
     'playerColor' => $variables['options']['color'],
     'endVideoBehavior' => $variables['options']['end_video'],
     'embedType' => ($variables['options']['video_type'] == 'popover') ? $variables['options']['video_type'] : $variables['options']['embed_type'],
-    'ssl' => 'false'
+    'ssl' => $variables['options']['ssl'] ? 'true' : 'false'
   );
 
   if($variables['options']['video_type'] == 'popover') {
@@ -77,7 +70,7 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
 
   }
 
-  $url = $protocol . 'fast.wistia.net/embed/medias/' . $variables['video_id'] . '?' . http_build_query($query);
+  $url = 'http://fast.wistia.net/embed/medias/' . $variables['video_id'] . '?' . http_build_query($query);
 
   $params = array('url' => $url);
 
