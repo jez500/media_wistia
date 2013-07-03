@@ -105,8 +105,10 @@ function media_wistia_variable_default($name = NULL) {
 
   if (!isset($defaults)) {
     $defaults = array(
+      'video_type' => 'inline',
       'width' => 640,
       'height' => 360,
+      'embed_type' => 'iframe',
       'color' => '636155',
       'autoplay' => FALSE,
       'end_video' => '',

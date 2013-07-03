@@ -50,10 +50,13 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
   $variables['alternative_content'] = t('Video of @title', array('@title' => $variables['title']));
 
   $query = array(
+    'version' => 'v1',
     'playButton' => $variables['options']['play_button'] ? 'true' : 'false',
     'smallPlayButton' => $variables['options']['small_play_button'] ? 'true' : 'false',
     'playbar' => $variables['options']['playbar'] ? 'true' : 'false',
     'controlsVisibleOnLoad' => $variables['options']['controls_on_load'] ? 'true' : 'false',
+    'videoHeight' => $variables['options']['height'],
+    'videoWidth' => $variables['options']['width'],
     'height' => $variables['options']['height'],
     'width' => $variables['options']['width'],
     'volumeControl' => $variables['options']['volume_control'] ? 'true' : 'false',
@@ -61,8 +64,18 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
     'autoPlay' => $variables['options']['autoplay'] ? 'true' : 'false',
     'playerColor' => $variables['options']['color'],
     'endVideoBehavior' => $variables['options']['end_video'],
-    'embedType' => 'iframe' // or api, or seo
+    'embedType' => ($variables['options']['video_type'] == 'popover') ? $variables['options']['video_type'] : $variables['options']['embed_type'],
+    'ssl' => 'false'
   );
+
+  if($variables['options']['video_type'] == 'popover') {
+
+    $query['popoverWidth'] = $variables['options']['width'];
+    $query['popoverHeight'] = $variables['options']['height'];
+
+    $query['popover'] = 'v1';
+
+  }
 
   $url = $protocol . 'fast.wistia.net/embed/medias/' . $variables['video_id'] . '?' . http_build_query($query);
 

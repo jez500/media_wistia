@@ -15,7 +15,7 @@ function media_wistia_file_formatter_info() {
     'file types' => array('video'),
     'default settings' => array(),
     'view callback' => 'media_wistia_file_formatter_video_view',
-    'settings callback' => 'media_wistia_file_formatter_video_settings',
+    'settings callback' => 'media_wistia_file_formatter_video_settings'
   );
 
   foreach(media_wistia_variable_default() as $setting => $value) {
@@ -29,7 +29,7 @@ function media_wistia_file_formatter_info() {
       'image_style' => '',
     ),
     'view callback' => 'media_wistia_file_formatter_image_view',
-    'settings callback' => 'media_wistia_file_formatter_image_settings',
+    'settings callback' => 'media_wistia_file_formatter_image_settings'
   );
 
   return $formatters;
@@ -64,6 +64,15 @@ function media_wistia_file_formatter_video_view($file, $display, $langcode) {
 function media_wistia_file_formatter_video_settings($form, &$form_state, $settings) {
   $element = array();
 
+  $element['video_type'] = array(
+    '#title' => t('Video Type'),
+    '#type' => 'radios',
+    '#options' => array(
+      'inline' => 'Inline',
+      'popover' => 'Popup',
+    ),
+    '#default_value' => $settings['video_type'],
+  );
   $element['width'] = array(
     '#title' => t('Width'),
     '#type' => 'textfield',
@@ -76,10 +85,25 @@ function media_wistia_file_formatter_video_settings($form, &$form_state, $settin
     '#default_value' => $settings['height'],
     '#element_validate' => array('_wistia_validate_video_width_and_height'),
   );
+  $element['embed_type'] = array(
+    '#title' => t('Embed Type'),
+    '#type' => 'radios',
+    '#options' => array(
+      'iframe' => 'iFrame',
+      'api' => 'API',
+      'seo' => 'SEO',
+    ),
+    '#default_value' => $settings['embed_type'],
+    '#states' => array(
+      'visible' => array(
+        'input[name="displays[media_wistia_video][settings][video_type]"]' => array('checked' => TRUE)
+      )
+    )
+  );
 
   // Single Options.
   $element['color'] = array(
-    '#title' => t('Controls visible on load'),
+    '#title' => t('Color'),
     '#type' => module_exists('jquery_colorpicker') ? 'jquery_colorpicker' : 'textfield',
     '#default_value' => $settings['color'],
   );
@@ -89,7 +113,7 @@ function media_wistia_file_formatter_video_settings($form, &$form_state, $settin
     '#default_value' => $settings['autoplay'],
   );
   $element['end_video'] = array(
-    '#title' => t('Autoplay'),
+    '#title' => t('End Video'),
     '#type' => 'radios',
     '#options' => array(
       '' => 'Pause on the last frame',
