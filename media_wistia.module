@@ -25,13 +25,10 @@ include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/i
 function media_wistia_media_internet_providers()
 {
   $info = array();
-  $api_key = variable_get('media_wistia_api_key', '');
 
-  if (!empty($api_key)) {
-    $info['MediaInternetWistiaHandler'] = array(
-      'title' => t('Wistia'),
-    );
-  }
+  $info['MediaInternetWistiaHandler'] = array(
+    'title' => t('Wistia'),
+  );
 
   return $info;
 }

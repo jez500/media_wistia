@@ -21,5 +21,12 @@ function media_wistia_uninstall() {
   foreach (media_wistia_variable_default() as $variable => $value) {
     media_wistia_variable_del($variable);
   }
+
+  // deleting the administration
+  variable_del('media_wistia_api_key');
+  variable_del('media_wistia_api_url');
+  variable_del('media_wistia_oembed_url');
+  variable_del('media_wistia_getembed_url');
+
   return array(array('success' => TRUE, 'query' => "Deleted all variables in the Media: Wistia namespace."));
 }
