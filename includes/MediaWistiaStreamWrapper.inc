@@ -15,6 +15,7 @@ include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/i
 class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
 
   protected $api;
+  protected $base_url = 'http://home.wistia.com/medias/';
 
   public function __construct() {
     $this->api = new DrupalWistiaApi(variable_get('media_wistia_api_key'));
@@ -26,12 +27,9 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
    */
   function interpolateUrl() {
     $parameters = $this->get_parameters();
-    if (!empty($parameters['url'])) {
-      $media = $parameters['url'];
-    } else {
-      $media = $this->api->mediaShow($parameters['v']);
+    if (!empty($parameters['v'])) {
+      return $this->base_url . $parameters['v'];
     }
-    return $media;
   }
 
   /**
@@ -83,16 +81,16 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
     return $local_path;
   }
 
-  function setUri($uri) {
-    $this->uri = $uri;
-    $parameters = $this->_parse_url($uri);
-    if($parameters['v'] == 'http') {
-      $parameters['url'] =  $this->mediaWistiaParseHttpUrl($this->getUri());
-      $parameters['v'] = $this->parse($parameters['url']);
-    }
-
-    $this->parameters = $parameters;
-  }
+//  function setUri($uri) {
+//    $this->uri = $uri;
+//    $parameters = $this->_parse_url($uri);
+//    if($parameters['v'] == 'http') {
+//      $parameters['url'] =  $this->mediaWistiaParseHttpUrl($this->getUri());
+//      $parameters['v'] = $this->parse($parameters['url']);
+//    }
+//
+//    $this->parameters = $parameters;
+//  }
 
   function mediaWistiaParseHttpUrl($url) {
     $parts = explode("//v/", $url);

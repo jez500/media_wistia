@@ -110,15 +110,6 @@ function media_wistia_variable_default($name = NULL) {
       'height' => 360,
       'embed_type' => 'iframe',
       'ssl' => FALSE,
-      'color' => '636155',
-      'autoplay' => FALSE,
-      'end_video' => '',
-      'play_button' => TRUE,
-      'small_play_button' => TRUE,
-      'playbar' => TRUE,
-      'volume_control' => TRUE,
-      'fullscreen' => TRUE,
-      'controls_on_load' => TRUE,
     );
   }
 

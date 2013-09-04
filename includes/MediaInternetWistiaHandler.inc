@@ -16,6 +16,7 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
   public function parse($embedCode) {
     $patterns = array(
       '/https?:\/\/(.+)?(wistia\.com|wi\.st)\/(medias|embed)\/(.*)/',
+      '/https?:\/\/(.+)?(wistia\.net|wi\.st)\/(medias|embed)\/.*\/([^"]+)"/',
     );
     foreach ($patterns as $pattern) {
       preg_match($pattern, $embedCode, $matches);
@@ -44,16 +45,10 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
    */
   public function getFileObject() {
     $uri = $this->parse($this->embedCode);
-    if(!strncmp($this->embedCode, 'http', strlen('http'))) {
-      $uri = 'wistia://v/' . $this->embedCode;
-    }
-    $info = $this->getOEmbed();
-
     $file = file_uri_to_object($uri, TRUE);
 
-    if (empty($file->fid) && $info) {
+    if (empty($file->fid) && $info = $this->getOEmbed()) {
       $file->filename = truncate_utf8($info['title'], 255);
-      $file->uri = $uri;
     }
 
     return $file;
@@ -70,7 +65,9 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
   public function getOEmbed() {
     static $response;
     if(empty($response)) {
-      $response = _media_wistia_request_data($this->embedCode);
+      $uri = $this->parse($this->embedCode);
+      $external_url = file_create_url($uri);
+      $response = _media_wistia_request_data($external_url);
     }
     if (!empty($response)) {
       return $response;

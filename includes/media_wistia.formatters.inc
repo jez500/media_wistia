@@ -106,58 +106,6 @@ function media_wistia_file_formatter_video_settings($form, &$form_state, $settin
     '#default_value' => $settings['ssl'],
   );
 
-  // Single Options.
-  $element['color'] = array(
-    '#title' => t('Color'),
-    '#type' => module_exists('jquery_colorpicker') ? 'jquery_colorpicker' : 'textfield',
-    '#default_value' => $settings['color'],
-  );
-  $element['autoplay'] = array(
-    '#title' => t('Autoplay'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['autoplay'],
-  );
-  $element['end_video'] = array(
-    '#title' => t('End Video'),
-    '#type' => 'radios',
-    '#options' => array(
-      '' => 'Pause on the last frame',
-      'reset' => 'Reset to the first frame',
-      'loop' => 'Loop the video',
-    ),
-    '#default_value' => $settings['end_video'],
-  );
-  $element['play_button'] = array(
-    '#title' => t('Big play button'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['play_button'],
-  );
-  $element['small_play_button'] = array(
-    '#title' => t('Small play button'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['small_play_button'],
-  );
-  $element['playbar'] = array(
-    '#title' => t('Playbar'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['playbar'],
-  );
-  $element['volume_control'] = array(
-    '#title' => t('Volume Control'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['volume_control'],
-  );
-  $element['fullscreen'] = array(
-    '#title' => t('Fullscreen button'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['fullscreen'],
-  );
-  $element['controls_on_load'] = array(
-    '#title' => t('Controls visible on load'),
-    '#type' => 'checkbox',
-    '#default_value' => $settings['controls_on_load'],
-  );
-
   return $element;
 }
 
@@ -228,26 +176,27 @@ function media_wistia_file_default_displays() {
   $default_video_settings = array(
     'default' => array(
       'width' => 640,
-      'height' => 390,
+      'height' => 390
     ),
     'teaser' => array(
       'width' => 560,
-      'height' => 340,
-      'autoplay' => FALSE,
+      'height' => 340
     ),
     // Legacy view modes included to support older versions of Media,
     // before #1051090 went through. They do no harm and can sit here
     // until there is a Media 2.x stable.
     // @TODO: Remove when Media 2.0 is released.
-    'media_large' => array(
-      'width' => 560,
-      'height' => 340,
-      'autoplay' => FALSE,
-    ),
+      'media_large' => array(
+          'width' => 560,
+          'height' => 340
+      ),
+      'media_small' => array(
+          'width' => 560,
+          'height' => 340
+      ),
     'media_original' => array(
       'width' => 640,
-      'height' => 390,
-      'autoplay' => media_wistia_variable_get('autoplay'),
+      'height' => 390
     ),
   );
   foreach ($default_video_settings as $view_mode => $settings) {
@@ -273,6 +222,7 @@ function media_wistia_file_default_displays() {
     // Legacy view modes, see note above.
     'media_preview' => 'square_thumbnail',
     'media_large' => 'large',
+    'media_small' => 'medium',
     'media_original' => '',
   );
   foreach ($default_image_styles as $view_mode => $image_style) {
