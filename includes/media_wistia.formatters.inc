@@ -18,7 +18,7 @@ function media_wistia_file_formatter_info() {
     'settings callback' => 'media_wistia_file_formatter_video_settings'
   );
 
-  foreach(media_wistia_variable_default() as $setting => $value) {
+  foreach (media_wistia_variable_default() as $setting => $value) {
     $formatters['media_wistia_video']['default settings'][$setting] = media_wistia_variable_get($setting);
   }
 

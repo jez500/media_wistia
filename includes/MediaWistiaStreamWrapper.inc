@@ -48,10 +48,11 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
    */
   function getOriginalThumbnailPath($http_path = '') {
     $parts = $this->get_parameters();
-    if(!empty($parts['url'])) {
+    if (!empty($parts['url'])) {
       $media = _media_wistia_request_data($parts['url']);
       $url = $media['thumbnail_url'];
-    } else {
+    }
+    else {
       $media = $this->api->mediaShow($parts['v']);
       $url = $media->thumbnail->url;
     }

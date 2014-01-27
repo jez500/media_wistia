@@ -52,7 +52,7 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
     'ssl' => $variables['options']['ssl'] ? 'true' : 'false'
   );
 
-  if($variables['options']['video_type'] == 'popover') {
+  if ($variables['options']['video_type'] == 'popover') {
 
     $query['popoverWidth'] = $variables['options']['width'];
     $query['popoverHeight'] = $variables['options']['height'];
@@ -76,8 +76,7 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
  * @param $query array the quiery string to send to the endpoint.
  * @return array|bool
  */
-function _media_wistia_request_embed($query)
-{
+function _media_wistia_request_embed($query) {
   // Make HTTP request.
   $endpoint = variable_get('media_wistia_getembed_url', MEDIA_WISTIA_DEFAULT_GETEMBED_URL);
   $result = drupal_http_request(url($endpoint, array('query' => $query)));
@@ -85,7 +84,8 @@ function _media_wistia_request_embed($query)
   if ($data = json_decode($result->data)) {
     // Success.
     return (array)$data;
-  } else {
+  }
+  else {
     // Failure. Either the video or playlist doesn't exist on Wistia or there
     // was an error with the request.
     return FALSE;

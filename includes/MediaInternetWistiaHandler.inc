@@ -64,7 +64,7 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
    */
   public function getOEmbed() {
     static $response;
-    if(empty($response)) {
+    if (empty($response)) {
       $uri = $this->parse($this->embedCode);
       $external_url = file_create_url($uri);
       $response = _media_wistia_request_data($external_url);

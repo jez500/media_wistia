@@ -1,4 +1,9 @@
 <?php
+/**
+ * @file
+ * Media: Wistia provides a stream wrapper and formatters for videos provided
+ * by Wistia.
+ */
 
 function media_wistia_global_settings() {
 

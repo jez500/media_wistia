@@ -22,8 +22,7 @@ include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/i
  *
  * Provides the wistia provider handler for handling the wistia urls and getting the wistia file objects
  */
-function media_wistia_media_internet_providers()
-{
+function media_wistia_media_internet_providers() {
   $info = array();
 
   $info['MediaInternetWistiaHandler'] = array(
@@ -37,8 +36,7 @@ function media_wistia_media_internet_providers()
  * Implements hook_stream_wrappers().
  * Provides the wistia
  */
-function media_wistia_stream_wrappers()
-{
+function media_wistia_stream_wrappers() {
   $info['wistia'] = array(
     'name' => t('Wistia videos'),
     'class' => 'MediaWistiaStreamWrapper',
@@ -52,8 +50,7 @@ function media_wistia_stream_wrappers()
 /**
  * Implements hook_media_browser_plugin_info().
  */
-function media_wistia_media_browser_plugin_info()
-{
+function media_wistia_media_browser_plugin_info() {
   $plugins = array();
   $api_key = variable_get('media_wistia_api_key', '');
 
@@ -66,8 +63,7 @@ function media_wistia_media_browser_plugin_info()
   return $plugins;
 }
 
-function media_wistia_media_browser_plugin_view($plugin_name, $params)
-{
+function media_wistia_media_browser_plugin_view($plugin_name, $params) {
   $path = drupal_get_path('module', 'media_wistia');
 
   $params += array(
@@ -102,8 +98,7 @@ function media_wistia_media_browser_plugin_view($plugin_name, $params)
 /**
  * Implements hook_permission().
  */
-function media_wistia_permission()
-{
+function media_wistia_permission() {
   return array(
     'administer wistia' => array(
       'title' => t('Administer Media: Wistia'),
@@ -111,8 +106,7 @@ function media_wistia_permission()
   );
 }
 
-function media_wistia_menu()
-{
+function media_wistia_menu() {
 
   $items['admin/config/services/wistia'] = array(
     'title' => 'Wistia Settings',
@@ -150,8 +144,7 @@ function media_wistia_menu()
 /**
  * Implements hook_theme().
  */
-function media_wistia_theme($existing, $type, $theme, $path)
-{
+function media_wistia_theme($existing, $type, $theme, $path) {
   return array(
     'media_wistia_video' => array(
       'variables' => array('uri' => NULL, 'options' => array()),
@@ -171,8 +164,7 @@ function media_wistia_theme($existing, $type, $theme, $path)
 /**
  * Implements hook_media_parse().
  */
-function media_wistia_media_parse($embed_code)
-{
+function media_wistia_media_parse($embed_code) {
   $handler = new MediaInternetWistiaHandler($embed_code);
   return $handler->parse($embed_code);
 }
@@ -182,8 +174,7 @@ function media_wistia_media_parse($embed_code)
  *
  * Regster the video/wistia mimetype.
  */
-function media_wistia_file_mimetype_mapping_alter(&$mapping)
-{
+function media_wistia_file_mimetype_mapping_alter(&$mapping) {
   $mapping['mimetypes'][] = 'video/wistia';
 }
 
@@ -192,16 +183,14 @@ function media_wistia_file_mimetype_mapping_alter(&$mapping)
  *
  * Adds the video/wistia fake mimetype to video files.
  */
-function media_wistia_file_default_types_alter(&$types)
-{
+function media_wistia_file_default_types_alter(&$types) {
   $types['video']->mimetypes[] = 'video/wistia';
 }
 
 /**
  * Implements hook_ctools_plugin_api().
  */
-function media_wistia_ctools_plugin_api($owner, $api)
-{
+function media_wistia_ctools_plugin_api($owner, $api) {
   static $api_versions = array(
     'file_entity' => array(
       'file_default_displays' => 1,
@@ -223,8 +212,7 @@ function media_wistia_ctools_plugin_api($owner, $api)
  *   An array of data about the video or playlist if the request is successful,
  *   otherwise FALSE.
  */
-function _media_wistia_request_data($url)
-{
+function _media_wistia_request_data($url) {
   // Make HTTP request.
   $endpoint = variable_get('media_wistia_oembed_url', MEDIA_WISTIA_DEFAULT_OEMBED_URL);
   $url_options['query'] = array(
@@ -235,7 +223,8 @@ function _media_wistia_request_data($url)
   if ($data = json_decode($result->data)) {
     // Success.
     return (array)$data;
-  } else {
+  }
+  else {
     // Failure. Either the video or playlist doesn't exist on Wistia or there
     // was an error with the request.
     return FALSE;
