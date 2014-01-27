@@ -1,3 +1,8 @@
+/**
+ *  @file
+ *  Create the 'Wistia' tab for the WYSIWYG plugins.
+ */
+
 (function ($) {
   namespace('Drupal.media.browser');
 
