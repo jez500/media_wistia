@@ -16,7 +16,7 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
   public function parse($embedCode) {
     $patterns = array(
       '/https?:\/\/(.+)?(wistia\.com|wi\.st)\/(medias|embed)\/(.*)/',
-      '/https?:\/\/(.+)?(wistia\.net|wi\.st)\/(medias|embed)\/.*\/([^"]+)"/',
+      '/https?:\/\/(.+)?(wistia\.net|wi\.st)\/(medias|embed)\/.*\/([^"]+)/',
     );
     foreach ($patterns as $pattern) {
       preg_match($pattern, $embedCode, $matches);
