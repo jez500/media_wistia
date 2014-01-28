@@ -48,13 +48,18 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
    */
   function getOriginalThumbnailPath($http_path = '') {
     $parts = $this->get_parameters();
-    if (!empty($parts['url'])) {
-      $media = _media_wistia_request_data($parts['url']);
-      $url = $media['thumbnail_url'];
-    }
-    else {
+    if (!empty($parts['v']) && $this->api->hasApiKey()) {
       $media = $this->api->mediaShow($parts['v']);
       $url = $media->thumbnail->url;
+    }
+    else {
+      if(isset($parts['url'])) {
+        $media = _media_wistia_request_data($parts['url']);
+        $url = $media['thumbnail_url'];
+      } else {
+        $media = _media_wistia_request_data($this->base_url . $parts['v']);
+        $url = $media['thumbnail_url'];
+      }
     }
     return $url;
   }
