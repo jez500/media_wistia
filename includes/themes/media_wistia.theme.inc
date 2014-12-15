@@ -1,8 +1,6 @@
 <?php
-
 /**
- * @file media_wistia/includes/themes/media_wistia.theme.inc
- *
+ * @file
  * Theme and preprocess functions for Media: Wistia.
  */
 
@@ -49,7 +47,7 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
     'height' => $variables['options']['height'],
     'width' => $variables['options']['width'],
     'embedType' => ($variables['options']['video_type'] == 'popover') ? $variables['options']['video_type'] : $variables['options']['embed_type'],
-    'ssl' => $variables['options']['ssl'] ? 'true' : 'false'
+    'ssl' => $variables['options']['ssl'] ? 'true' : 'false',
   );
 
   if ($variables['options']['video_type'] == 'popover') {
@@ -67,14 +65,18 @@ function media_wistia_preprocess_media_wistia_video(&$variables) {
 
   $embed = _media_wistia_request_embed($params);
 
-  // Build the iframe URL with options query strings
+  // Build the iframe URL with options query strings.
   $variables['embed'] = $embed['html'];
 }
 
 /**
  * Request to embed code from the wistia get embed endpoint.
- * @param $query array the quiery string to send to the endpoint.
+ *
+ * @param array $query
+ *   The quiery string to send to the endpoint.
+ *
  * @return array|bool
+ *   Array on success FALSE on failure.
  */
 function _media_wistia_request_embed($query) {
   // Make HTTP request.
@@ -83,7 +85,7 @@ function _media_wistia_request_embed($query) {
 
   if ($data = json_decode($result->data)) {
     // Success.
-    return (array)$data;
+    return (array) $data;
   }
   else {
     // Failure. Either the video or playlist doesn't exist on Wistia or there

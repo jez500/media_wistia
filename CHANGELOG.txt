@@ -6,3 +6,4 @@ Changelog for the Media: Wistia module.
 =============
  DRUPAL-7--1
 =============
+

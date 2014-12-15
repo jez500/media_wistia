@@ -1,8 +1,6 @@
 <?php
-
 /**
- * @file media_wistia/includes/media_wistia.formatters.inc
- *
+ * @file
  * Formatters for Media: Wistia.
  */
 
@@ -15,7 +13,7 @@ function media_wistia_file_formatter_info() {
     'file types' => array('video'),
     'default settings' => array(),
     'view callback' => 'media_wistia_file_formatter_video_view',
-    'settings callback' => 'media_wistia_file_formatter_video_settings'
+    'settings callback' => 'media_wistia_file_formatter_video_settings',
   );
 
   foreach (media_wistia_variable_default() as $setting => $value) {
@@ -29,7 +27,7 @@ function media_wistia_file_formatter_info() {
       'image_style' => '',
     ),
     'view callback' => 'media_wistia_file_formatter_image_view',
-    'settings callback' => 'media_wistia_file_formatter_image_settings'
+    'settings callback' => 'media_wistia_file_formatter_image_settings',
   );
 
   return $formatters;
@@ -96,9 +94,9 @@ function media_wistia_file_formatter_video_settings($form, &$form_state, $settin
     '#default_value' => $settings['embed_type'],
     '#states' => array(
       'visible' => array(
-        'input[name="displays[media_wistia_video][settings][video_type]"]' => array('checked' => TRUE)
-      )
-    )
+        'input[name="displays[media_wistia_video][settings][video_type]"]' => array('checked' => TRUE),
+      ),
+    ),
   );
   $element['ssl'] = array(
     '#title' => t('Use SSL'),
@@ -114,9 +112,10 @@ function media_wistia_file_formatter_video_settings($form, &$form_state, $settin
  */
 function _wistia_validate_video_width_and_height($element, &$form_state, $form) {
 
-  // Check if the value is a number with an optional decimal or percentage sign, or "auto".
+  // Check if the value is a number with an optional decimal or
+  // percentage sign, or "auto".
   if (!empty($element['#value']) && !preg_match('/^(auto|([0-9]*(\.[0-9]+)?%?))$/', $element['#value'])) {
-    form_error($element, t("The value entered for @dimension is invalid. Please insert a unitless integer for pixels, a percent, or \"auto\". Note that percent and auto may not function correctly depending on the browser and doctype.", array('@dimension' => $element['#title'])));
+    form_error($element, t('The value entered for @dimension is invalid. Please insert a unitless integer for pixels, a percent, or "auto". Note that percent and auto may not function correctly depending on the browser and doctype.', array('@dimension' => $element['#title'])));
   }
 }
 
@@ -176,27 +175,27 @@ function media_wistia_file_default_displays() {
   $default_video_settings = array(
     'default' => array(
       'width' => 640,
-      'height' => 390
+      'height' => 390,
     ),
     'teaser' => array(
       'width' => 560,
-      'height' => 340
+      'height' => 340,
     ),
     // Legacy view modes included to support older versions of Media,
     // before #1051090 went through. They do no harm and can sit here
     // until there is a Media 2.x stable.
     // @TODO: Remove when Media 2.0 is released.
-      'media_large' => array(
-          'width' => 560,
-          'height' => 340
-      ),
-      'media_small' => array(
-          'width' => 560,
-          'height' => 340
-      ),
+    'media_large' => array(
+      'width' => 560,
+      'height' => 340,
+    ),
+    'media_small' => array(
+      'width' => 560,
+      'height' => 340,
+    ),
     'media_original' => array(
       'width' => 640,
-      'height' => 390
+      'height' => 390,
     ),
   );
   foreach ($default_video_settings as $view_mode => $settings) {

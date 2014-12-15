@@ -1,7 +1,7 @@
 <?php
-
 /**
- * @file media_wistia/includes/themes/media-Wistia-video.tpl.php
+ * @file
+ * media_wistia/includes/themes/media-Wistia-video.tpl.php
  *
  * Template file for theme('media_wistia_video').
  *
@@ -18,7 +18,6 @@
  *  $title - The Media: Wistia file's title.
  *  $alternative_content - Text to display for browsers that don't support
  *  iframes.
- *
  */
 
 ?>

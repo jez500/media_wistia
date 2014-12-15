@@ -1,55 +1,64 @@
 <?php
 /**
+ * @file
  * WistiaApi
+ * 
  * A simple PHP Class for interfacing with the Wistia Data API
- * Starting Point can be seen here http://dev-forum.wistia.com/discussion/6/php-libraries - Thanks Brian Kutyah
- * I Don't need to write anything in my current scope, but this should be added at some point
- * Not sure why I prematurely optimized with a cache array
+ * Starting Point can be seen here 
+ * http://dev-forum.wistia.com/discussion/6/php-libraries
+ * Thanks Brian Kutyah
+ * 
+ * I Don't need to write anything in my current scope, 
+ * But this should be added at some point. Not sure why I prematurely optimized 
+ * with a cache array
+ * 
  * @since 6/26/2012
  */
 
 
-class WistiaApi
-{
+class WistiaApi {
+
   protected $format = 'json';
-  protected $apiKey = null;
+  protected $apiKey = NULL;
   protected $cache = array();
-  protected $debug = false;
+  protected $debug = FALSE;
   public $response = '';
 
   /**
-   * constructor
-   * Builds a new instance of this class, stores an authenticator api key
-   * @param string $apiKey get an api key from your wistia account
-   * @return boolean read or not
+   * Constructor.
+   * 
+   * Builds a new instance of this class, stores an authenticator api key.
+   * 
+   * @param string $api_key 
+   *   Get an api key from your wistia account.
    */
-  public function __construct($apiKey = null)
-  {
-    if ($apiKey) {
+  public function __construct($api_key = NULL) {
+    if ($api_key) {
       $this->cache = array();
-      $this->apiKey = $apiKey;
+      $this->apiKey = $api_key;
     }
   }
 
   /**
-   * A simple method to check if we can use the API
+   * A simple method to check if we can use the API.
+   * 
    * @return bool
+   *   Is there a key?
    */
-  public function hasApiKey()
-  {
-
+  public function hasApiKey() {
     return !empty($this->apiKey);
-
   }
 
   /**
-   * accountRead
+   * Account Read.
+   * 
    * Gets the account as a stdObject
-   * Properties id,name,url
-   * @return stdClass account
+   * Properties id, name, url.
+   * 
+   * @return object
+   *   The Wistia account.
    */
-  public function accountRead()
-  {
+  public function accountRead() {
     if (!isset($this->cache['account'])) {
       $this->cache['account'] = $this->sendRequest('account');
     }
@@ -57,28 +66,34 @@ class WistiaApi
   }
 
   /**
-   * accountStats
-   * Get some overall statistics for the account
+   * Account Stats.
+   * 
+   * Get some overall statistics for the account.
+   * 
    * @since 12/13/2012
-   * @return stdClass accountStat
+   * 
+   * @return object
+   *   Account stats object.
    */
-  public function accountStats()
-  {
+  public function accountStats() {
     if (!isset($this->cache['accountStats'])) {
       $this->cache['accountStats'] = $this->sendRequest('stats/account');
     }
     return $this->cache['accountStats'] = $this->sendRequest('stats/account');
-
   }
 
   /**
-   * eventRead
-   * gets the details from any given event
+   * Event Read.
+   * 
+   * Gets the details from any given event.
+   * 
    * @param string $key
-   * @return stdClass event
+   *   Event key.
+   * 
+   * @return object
+   *   Wistia object.
    */
-  public function eventRead($key = null)
-  {
+  public function eventRead($key = NULL) {
     if (!isset($this->cache['events'][$key])) {
       $this->cache['events'][$key] = $this->sendRequest('events', array('event_key' => $key));
     }
@@ -86,28 +101,34 @@ class WistiaApi
   }
 
   /**
-   * projectCreate
-   * Enter description here ...
-   * @param array $projectData assosciative array. Keys: name,(adminEmail),(anonymousCanUpload),(anonymousCanDownload),(public)
-   * @return stdObject wistiaProject
+   * Project Create.
+   * 
+   * @param array $project_data 
+   *   Assosciative array. 
+   *   Keys: name,(adminEmail),(anonymousCanUpload),
+   *         (anonymousCanDownload),(public)
+   * 
+   * @return object
+   *   Project object.
    */
-  public function projectCreate($projectData = null)
-  {
-    if (!$projectData) {
-      return null;
+  public function projectCreate($project_data = NULL) {
+    if (!$project_data) {
+      return NULL;
     }
-    //empty our cache
-    $this->cache['projects'] = null;
-    return $this->sendRequest('projects', $projectData);
+    // Empty our cache.
+    $this->cache['projects'] = NULL;
+    return $this->sendRequest('projects', $project_data);
   }
 
   /**
-   * projectList
-   * Fetches all of the projects in this account
-   * @return array of stdObjects
+   * Project List.
+   * 
+   * Fetches all of the projects in this account.
+   * 
+   * @return array
+   *   An array of project objects.
    */
-  public function projectList()
-  {
+  public function projectList() {
     if (!isset($this->cache['projects'])) {
       $this->cache['projects'] = $this->sendRequest('projects');
     }
@@ -115,64 +136,78 @@ class WistiaApi
   }
 
   /**
-   * projectUpdate
-   * Enter description here ...
-   * @param int $id wistiaProjectId
-   * @param stdObject $project name,(adminEmail),(anonymousCanUpload),(anonymousCanDownload),(public)
-   * @return stdObject $project
+   * Project Update.
+   * 
+   * @param object $project
+   *   Name,(adminEmail),(anonymousCanUpload),(anonymousCanDownload),(public).
+   * 
+   * @return object
+   *   Project object.
    */
-  public function projectUpdate($project = null)
-  {
+  public function projectUpdate($project = NULL) {
     if (!$project) {
-      return false;
+      return FALSE;
     }
-    //make sure that they are different
+    // Make sure that they are different.
     $id = $project->id;
     if (count(array_diff(get_object_vars($this->cache['projects'][$id]), get_object_vars($project))) == 0) {
       return $this->cache['projects'][$id];
     }
-    //empty our cache
-    $this->cache['projects'] = null;
-    return $this->sendRequest('projects/' . $id, $projectData);
+    // Empty our cache.
+    $this->cache['projects'] = NULL;
+    return $this->sendRequest('projects/' . $id);
   }
 
   /**
-   * mediaList
-   * Enter description here ...
-   * @param int $projectId an optional filter to show only videos from a specific project
-   * @return array stdObjects
+   * Media List.
+   *
+   * @param null $project_id
+   *   An optional filter to show only videos from a specific project.
+   * @param int $page
+   *   Page number
+   * @param int $per_page
+   *   Items per page
+   * @param bool $full
+   *   Load full set.
+   *
+   * @return array|mixed
+   *   Array of media objects.
    */
-  public function mediaList($projectId = null, $page = 1, $perPage = 100, $full = true)
-  {
-    if (!isset($this->cache['medias'][$projectId]) || $page > 1) {
+  public function mediaList($project_id = NULL, $page = 1, $per_page = 100, $full = TRUE) {
+    $medias = array();
+    if (!isset($this->cache['medias'][$project_id]) || $page > 1) {
       $params = array(
         'page' => $page,
-        'per_page' => $perPage
+        'per_page' => $per_page,
       );
-      if ($projectId) {
-        $params['project_id'] = $projectId;
+      if ($project_id) {
+        $params['project_id'] = $project_id;
       }
       $medias = $this->sendRequest('medias', $params);
 
     }
-    //if we received the max possible, query the next page
-    if ($full && count($medias) == $perPage) {
-      $nextPage = $this->mediaList($projectId, $page += 1, $perPage);
-      if (count($nextPage) > 0) {
-        $medias = array_merge($medias, $nextPage);
+    // If we received the max possible, query the next page.
+    if ($full && count($medias) == $per_page) {
+      $next_page = $this->mediaList($project_id, $page += 1, $per_page);
+      if (count($next_page) > 0) {
+        $medias = array_merge($medias, $next_page);
       }
     }
     return $medias;
   }
 
   /**
-   * mediaShow
+   * Media Show.
+   *
    * Get a video's details including its name, url, embed code, thumbnails, etc.
-   * @param int $id ie 7880 the wistia identifier for a video
-   * @return stdObject Video
+   *
+   * @param int $id
+   *   Ie 7880 the wistia identifier for a video.
+   *
+   * @return object
+   *   Video object.
    */
-  public function mediaShow($id = null)
-  {
+  public function mediaShow($id = NULL) {
     if (!isset($this->cache['media'][$id])) {
       $this->cache['media'][$id] = $this->sendRequest('medias/' . $id);
     }
@@ -180,13 +215,17 @@ class WistiaApi
   }
 
   /**
-   * mediaShowStats
-   * Gets the cumulative stats for a given video id
-   * @param int $id a wistia video id
-   * @return stdObject videoStats
+   * Media Show Stats.
+   *
+   * Gets the cumulative stats for a given video id.
+   *
+   * @param int $id
+   *   A Wistia video id
+   *
+   * @return object
+   *   Media stats object.
    */
-  public function mediaShowStats($id = null)
-  {
+  public function mediaShowStats($id = NULL) {
     if (!isset($this->cache['mediaStats'][$id])) {
       $this->cache['mediaStats'][$id] = $this->sendRequest('medias/' . $id . '/stats');
     }
@@ -194,14 +233,19 @@ class WistiaApi
   }
 
   /**
-   * mediaUpdate
+   * Media Update.
+   *
    * Update the media's name, description, and new_still_media_id
-   * @param stdObject $media
+   *
+   * @param object $media
+   *   Media object.
+   *
+   * @return object
+   *   Media object.
    */
-  public function mediaUpdate($media = null)
-  {
+  public function mediaUpdate($media = NULL) {
     if (!$media) {
-      return false;
+      return FALSE;
     }
     $id = $media->id;
     $params = array();
@@ -212,23 +256,26 @@ class WistiaApi
       $params['descriptions'] = $media->descriptions;
     }
     return $this->cache['media'][$id] = $this->sendRequest('medias/' . $id, $params);
-
-
   }
 
   /**
-   * sendRequest
-   * Enter description here ...
-   * @param strings $module
+   * Send Request.
+   *
+   * @param string $module
+   *   Component to send to the api.
+   *
    * @param array $params
-   * @return mixed array/stdobject (from json_decode)
+   *   Params to send to the api.
+   *
+   * @return mixed
+   *   Response from the api.
    */
-  protected function sendRequest($module, $params = null)
-  {
-    //build our url
+  protected function sendRequest($module, $params = NULL) {
+
+    // Build our url.
     $url = variable_get('media_wistia_api_url', 'https://api.wistia.com/v1/') . $module . '.' . $this->format;
 
-    //Set our aparams if we have them
+    // Set our aparams if we have them.
     if ($params) {
       $url .= '?' . http_build_query($params);
     }
@@ -236,7 +283,7 @@ class WistiaApi
       echo 'Sending Request: ' . $url;
     }
 
-    $result = $this->__send($url, $params);
+    $result = $this->send($url, $params);
 
     if ($this->debug) {
       echo 'Received: ' . $result;
@@ -245,8 +292,16 @@ class WistiaApi
     return $result;
   }
 
-  protected function __send($url)
-  {
+  /**
+   * Send request.
+   *
+   * @param string $url
+   *   Url to send
+   *
+   * @return mixed
+   *   Json response.
+   */
+  protected function send($url) {
     $username = 'api';
 
     $ch = curl_init();
@@ -263,13 +318,19 @@ class WistiaApi
     return $result;
   }
 
-  public function enableDebugging()
-  {
-    $this->debug = true;
+  /**
+   * Debugging.
+   */
+  public function enableDebugging() {
+    $this->debug = TRUE;
   }
+
 }
 
-class WistiaException extends Exception
-{
-
+/**
+ * Class WistiaException
+ *
+ * Currently unused.
+ */
+class WistiaException extends Exception {
 }

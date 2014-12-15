@@ -1,8 +1,6 @@
 <?php
-
 /**
- * @file media_wistia/includes/MediaInternetWistiaHandler.inc
- *
+ * @file
  * Contains MediaInternetWistiaHandler.
  */
 
@@ -13,35 +11,40 @@
  */
 class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
 
-  public function parse($embedCode) {
+  /**
+   * Parse the embed code.
+   */
+  public function parse($embed_code) {
     $patterns = array(
-      '/https?:\/\/(.+)?(wistia\.com|wi\.st)\/(medias|embed)\/(.*)/',
-      '/https?:\/\/(.+)?(wistia\.net|wi\.st)\/(medias|embed)\/.*\/([^"]+)/',
+      '/https?:\/\/(.+)?(wistia\.com|wi\.st|wistia\.net)\/(medias|embed\/iframe|embed)\/(.*)/',
     );
     foreach ($patterns as $pattern) {
-      preg_match($pattern, $embedCode, $matches);
+      preg_match($pattern, $embed_code, $matches);
       if (isset($matches[4])) {
         return file_stream_wrapper_uri_normalize('wistia://v/' . $matches[4]);
       }
     }
+    return '';
   }
 
   /**
-   * checks to make sure the url is a wistia url
-   * @param string $embedCode the wistia url
+   * Checks to make sure the url is a wistia url.
+   *
+   * @param string $embed_code
+   *   The wistia url
+   *
    * @return bool
+   *   Is the url correct.
    */
-  public function claim($embedCode) {
-    if ($this->parse($embedCode)) {
+  public function claim($embed_code) {
+    if ($this->parse($embed_code)) {
       return TRUE;
     }
     return FALSE;
   }
 
   /**
-   * Gets the wistia file object
-   * @param null $uri
-   * @return mixed|StdClass
+   * Gets the wistia file object.
    */
   public function getFileObject() {
     $uri = $this->parse($this->embedCode);
@@ -57,7 +60,7 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
   /**
    * Returns information about the media. See http://www.oembed.com/.
    *
-   * @return
+   * @return array
    *   If oEmbed information is available, an array containing 'title', 'type',
    *   'url', and other information as specified by the oEmbed standard.
    *   Otherwise, NULL.
@@ -74,7 +77,7 @@ class MediaInternetWistiaHandler extends MediaInternetBaseHandler {
     }
     else {
       throw new Exception("Error Processing Request. (Error: {$response->code}, {$response->error})");
-      return;
     }
   }
+
 }

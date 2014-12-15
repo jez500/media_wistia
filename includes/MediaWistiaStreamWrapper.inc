@@ -1,9 +1,7 @@
 <?php
-
 /**
- *  @file media_wistia/includes/MediaWistiaStreamWrapper.inc
- *
- *  Create a Wistia Stream Wrapper class for the Media/Resource module.
+ * @file
+ * Create a Wistia Stream Wrapper class for the Media/Resource module.
  */
 
 include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/includes/DrupalWistiaApi.php';
@@ -15,49 +13,59 @@ include_once DRUPAL_ROOT . '/' . drupal_get_path('module', 'media_wistia') . '/i
 class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
 
   protected $api;
-  protected $base_url = 'http://home.wistia.com/medias/';
+  protected $baseUrl = 'http://home.wistia.com/medias/';
 
+  /**
+   * Constructor.
+   */
   public function __construct() {
     $this->api = new DrupalWistiaApi(variable_get('media_wistia_api_key'));
   }
 
   /**
    * Overrides interpolateUrl() defined in MediaReadOnlyStreamWrapper.
+   *
    * Checks to see if the video is in our cache, if not we request from the api.
    */
-  function interpolateUrl() {
+  public function interpolateUrl() {
     $parameters = $this->get_parameters();
     if (!empty($parameters['v'])) {
-      return $this->base_url . $parameters['v'];
+      return $this->baseUrl . $parameters['v'];
     }
+    return '';
   }
 
   /**
    * Returns the wistia mimetype.
-   * @param $uri
+   *
+   * @param string $uri
+   *   Uri.
    * @param null $mapping
+   *   Mappings.
+   *
    * @return string
+   *   Wistia mime type.
    */
-  static function getMimeType($uri, $mapping = NULL) {
+  public static function getMimeType($uri, $mapping = NULL) {
     return 'video/wistia';
   }
 
   /**
-   * Gets the original thumbnail for the wistia video
-   * @return mixed
+   * Gets the original thumbnail for the wistia video.
    */
-  function getOriginalThumbnailPath($http_path = '') {
+  public function getOriginalThumbnailPath($http_path = '') {
     $parts = $this->get_parameters();
     if (!empty($parts['v']) && $this->api->hasApiKey()) {
       $media = $this->api->mediaShow($parts['v']);
       $url = $media->thumbnail->url;
     }
     else {
-      if(isset($parts['url'])) {
+      if (isset($parts['url'])) {
         $media = _media_wistia_request_data($parts['url']);
         $url = $media['thumbnail_url'];
-      } else {
-        $media = _media_wistia_request_data($this->base_url . $parts['v']);
+      }
+      else {
+        $media = _media_wistia_request_data($this->baseUrl . $parts['v']);
         $url = $media['thumbnail_url'];
       }
     }
@@ -65,10 +73,9 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
   }
 
   /**
-   * Returns the url to the thumbnail for the wistia video
-   * @return string
+   * Returns the url to the thumbnail for the wistia video.
    */
-  function getLocalThumbnailPath() {
+  public function getLocalThumbnailPath() {
     $parts = $this->get_parameters();
     $local_path = file_default_scheme() . '://media-wistia/' . check_plain($parts['v']) . '.jpg';
     if (!file_exists($local_path)) {
@@ -87,32 +94,29 @@ class MediaWistiaStreamWrapper extends MediaReadOnlyStreamWrapper {
     return $local_path;
   }
 
-//  function setUri($uri) {
-//    $this->uri = $uri;
-//    $parameters = $this->_parse_url($uri);
-//    if($parameters['v'] == 'http') {
-//      $parameters['url'] =  $this->mediaWistiaParseHttpUrl($this->getUri());
-//      $parameters['v'] = $this->parse($parameters['url']);
-//    }
-//
-//    $this->parameters = $parameters;
-//  }
-
-  function mediaWistiaParseHttpUrl($url) {
+  /**
+   * Parse the url.
+   */
+  public function mediaWistiaParseHttpUrl($url) {
     $parts = explode("//v/", $url);
 
     return $parts[1];
   }
 
-  function parse($embedCode) {
+  /**
+   * Parse the embed code.
+   */
+  public function parse($embed_code) {
     $patterns = array(
-      '/https?:\/\/(.+)?(wistia\.com|wi\.st)\/(medias|embed)\/(.*)/',
+      '/https?:\/\/(.+)?(wistia\.com|wi\.st|wistia\.net)\/(medias|embed\/iframe|embed)\/(.*)/',
     );
     foreach ($patterns as $pattern) {
-      preg_match($pattern, $embedCode, $matches);
+      preg_match($pattern, $embed_code, $matches);
       if (isset($matches[4])) {
         return $matches[4];
       }
     }
+    return '';
   }
+
 }
